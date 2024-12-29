@@ -2,8 +2,17 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const pg = require('pg');
+const cors = require('cors');
 
 const app = express();
+const corsOptions = {
+  origin: process.env.UI_URL,
+  methods: 'GET,POST,PUT,DELETE',
+  allowedHeaders: 'Content-Type,Authorization',
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 
 // Middleware to parse JSON and URL-encoded form data
 app.use(bodyParser.json());
