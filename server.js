@@ -41,7 +41,7 @@ app.get("/leaderboard", async (req, res) => {
   try {
     const client = new pg.Client(urlConnection)
     client.connect();
-    const leaderboardResult = await client.query('Select * From GetLeaderboard()');
+    const leaderboardResult = await client.query('Select * From statquizdb.GetLeaderboard()');
     const rankResult = await client.query("Select * From GetRanking(" + score + ")");
     
     leaderboard = leaderboardResult.rows;
@@ -61,7 +61,7 @@ app.post('/quizparameters', async (req, res) => {
     const data = req.body;
     const client = new pg.Client(urlConnection)
     client.connect();
-    const result = await client.query("Select * From GetStat('" + data.field + "', '" + data.count + "')");
+    const result = await client.query("Select * From statquizdb.GetStat('" + data.field + "', '" + data.count + "')");
     client.end();
 
     statDetails = result.rows[0];
