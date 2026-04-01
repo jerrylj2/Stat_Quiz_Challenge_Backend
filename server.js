@@ -6,7 +6,7 @@ const cors = require('cors');
 
 const app = express();
 const corsOptions = {
-  origin: process.env.UI_URL,
+  origin: process.env.REACT_APP_API_URL,
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: 'Content-Type,Authorization',
   optionsSuccessStatus: 200,
