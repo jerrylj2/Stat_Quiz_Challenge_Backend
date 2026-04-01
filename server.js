@@ -7,12 +7,15 @@ const cors = require('cors');
 const app = express();
 const corsOptions = {
   origin: process.env.REACT_APP_API_URL,
-  methods: 'GET,POST,PUT,DELETE',
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
   allowedHeaders: 'Content-Type,Authorization',
   optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
+app.use(express.json());
+
 
 // Middleware to parse JSON and URL-encoded form data
 app.use(bodyParser.json());
@@ -25,16 +28,6 @@ let score = 0;
 let rank;
 
 const urlConnection = process.env.DATABASE_URL;
-
-// Gets the stat details
-app.get("/statdetails", async (req, res) => {
-  try {
-    res.json({ statDetails });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
 
 // Gets the leaderboard details and the user's ranking
 app.get("/leaderboard", async (req, res) => {
@@ -56,9 +49,9 @@ app.get("/leaderboard", async (req, res) => {
 });
 
 // Post the questions details based on the quiz type and question number
-app.post('/quizparameters', async (req, res) => {
+app.get('/statdetails', async (req, res) => {
   try {
-    const data = req.body;
+    const data = req.query;
     const client = new pg.Client(urlConnection)
     client.connect();
     const result = await client.query("Select * From statquizdb.GetStat('" + data.field + "', '" + data.count + "')");
@@ -66,7 +59,7 @@ app.post('/quizparameters', async (req, res) => {
 
     statDetails = result.rows[0];
 
-    res.json({ success: true, message: 'Data posted successfully' });
+    res.json(statDetails);
   } catch (error) {
     console.error('Error with quiz parameters:', error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });
