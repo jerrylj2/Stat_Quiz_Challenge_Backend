@@ -6,7 +6,10 @@ const cors = require('cors');
 
 const app = express();
 const corsOptions = {
-  origin: process.env.REACT_APP_API_URL,
+  origin: [
+    "http://localhost:3000",  // local UI
+    "https://sqztest-1f7e945bb308.herokuapp.com"  // deployed UI
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
   allowedHeaders: 'Content-Type,Authorization',
