@@ -51,7 +51,7 @@ app.get("/leaderboard", async (req, res) => {
     await client.connect();
 
     const leaderboardResult = await client.query('Select * From statquizdb.GetLeaderboard()');
-    const rankResult = await client.query("Select * From GetRanking($1)", [score]);
+    const rankResult = await client.query("Select * From GetRanking($1)", [parseInt(score)]);
     
     leaderboard = leaderboardResult.rows;
     rank = rankResult.rows[0];
@@ -104,7 +104,7 @@ app.post("/leaderboardparameters", async (req, res) => {
       }
     });
     await client.connect();
-    await client.query("Select * From SaveScore($1, $2)", [username, score]);
+    await client.query("Select * From SaveScore($1, $2)", [username, parseInt(score)]);
     await client.end();
 
     res.json({ success: true, message: 'Data posted successfully' });
