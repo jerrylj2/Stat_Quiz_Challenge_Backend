@@ -5,14 +5,25 @@ const pg = require('pg');
 const cors = require('cors');
 
 const app = express();
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://sqztest-1f7e945bb308.herokuapp.com"
+];
+
 const corsOptions = {
-  origin: [
-    "http://localhost:3000",  // local UI
-    "https://sqztest-1f7e945bb308.herokuapp.com"  // deployed UI
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
-  allowedHeaders: 'Content-Type,Authorization',
+  allowedHeaders: "Content-Type,Authorization",
   optionsSuccessStatus: 200,
 };
 
