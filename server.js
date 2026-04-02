@@ -38,15 +38,14 @@ let score = 0;
 let rank;
 
 const urlConnection = process.env.DATABASE_URL;
+const isProduction = process.env.NODE_ENV === "production";
 
 // Gets the leaderboard details and the user's ranking
 app.get("/leaderboard", async (req, res) => {
   try {
     const client = new pg.Client({
       connectionString: urlConnection,
-      ssl: {
-        rejectUnauthorized: false
-      }
+      ssl: isProduction ? { rejectUnauthorized: false } : false
     });
     await client.connect();
 
@@ -71,9 +70,7 @@ app.get('/statdetails', async (req, res) => {
     
     const client = new pg.Client({
       connectionString: urlConnection,
-      ssl: {
-        rejectUnauthorized: false
-      }
+      ssl: isProduction ? { rejectUnauthorized: false } : false
     });
     await client.connect();
 
@@ -99,9 +96,7 @@ app.post("/leaderboardparameters", async (req, res) => {
     score = req.body.score;
     const client = new pg.Client({
       connectionString: urlConnection,
-      ssl: {
-        rejectUnauthorized: false
-      }
+      ssl: isProduction ? { rejectUnauthorized: false } : false
     });
     await client.connect();
     await client.query("SELECT * FROM statquizdb.savescore($1, $2)", [username, parseInt(score)]);
