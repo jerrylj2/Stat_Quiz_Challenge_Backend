@@ -65,15 +65,24 @@ app.get("/leaderboard", async (req, res) => {
 // Post the questions details based on the quiz type and question number
 app.get('/statdetails', async (req, res) => {
   try {
-    const data = req.query;
-    const client = new pg.Client(urlConnection)
-    client.connect();
-    const result = await client.query("Select * From statquizdb.GetStat('" + data.field + "', '" + data.count + "')");
-    client.end();
+    const { field, count } = req.query;
 
-    statDetails = result.rows[0];
+    const client = new pg.Client(urlConnection);
+    await client.connect();
 
-    res.json(statDetails);
+    const result = await client.query(
+      "SELECT * FROM statquizdb.getstat($1, $2)",
+      [field, parseInt(count)]
+    );
+
+    await client.end();
+
+    if (!result.rows || result.rows.length === 0) {
+      return res.status(404).json({ message: "No data returned from GetStat" });
+    }
+
+    res.json(result.rows[0]);
+
   } catch (error) {
     console.error('Error with quiz parameters:', error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });
