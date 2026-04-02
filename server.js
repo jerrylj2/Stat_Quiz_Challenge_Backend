@@ -42,14 +42,20 @@ const urlConnection = process.env.DATABASE_URL;
 // Gets the leaderboard details and the user's ranking
 app.get("/leaderboard", async (req, res) => {
   try {
-    const client = new pg.Client(urlConnection)
-    client.connect();
+    const client = new pg.Client({
+      connectionString: urlConnection,
+      ssl: {
+        rejectUnauthorized: false
+      }
+    });
+    await client.connect();
+
     const leaderboardResult = await client.query('Select * From statquizdb.GetLeaderboard()');
-    const rankResult = await client.query("Select * From GetRanking(" + score + ")");
+    const rankResult = await client.query("Select * From GetRanking($1)", [score]);
     
     leaderboard = leaderboardResult.rows;
     rank = rankResult.rows[0];
-    client.end();
+    await client.end();
 
     res.json({ leaderboard, rank });
   } catch (err) {
@@ -61,11 +67,8 @@ app.get("/leaderboard", async (req, res) => {
 // Post the questions details based on the quiz type and question number
 app.get('/statdetails', async (req, res) => {
   try {
-    console.log("Incoming query params:", req.query);
-
     const { field, count } = req.query;
-    console.log("Parsed count:", parseInt(count));
-
+    
     const client = new pg.Client({
       connectionString: urlConnection,
       ssl: {
@@ -81,8 +84,6 @@ app.get('/statdetails', async (req, res) => {
 
     await client.end();
 
-    console.log("DB result:", result.rows);
-
     res.json(result.rows[0]);
 
   } catch (error) {
@@ -96,10 +97,15 @@ app.post("/leaderboardparameters", async (req, res) => {
   try {
     username = req.body.username;
     score = req.body.score;
-    const client = new pg.Client(urlConnection)
-    client.connect();
-    await client.query("Select * From SaveScore('" + username + "', " + score + ")");
-    client.end();
+    const client = new pg.Client({
+      connectionString: urlConnection,
+      ssl: {
+        rejectUnauthorized: false
+      }
+    });
+    await client.connect();
+    await client.query("Select * From SaveScore($1, $2)", [username, score]);
+    await client.end();
 
     res.json({ success: true, message: 'Data posted successfully' });
   } catch (error) {
