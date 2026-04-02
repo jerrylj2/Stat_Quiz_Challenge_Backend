@@ -5,15 +5,12 @@ const pg = require('pg');
 const cors = require('cors');
 
 const app = express();
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://sqztest-1f7e945bb308.herokuapp.com"
-];
+const allowedOrigins = process.env.REACT_APP_API_URL
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
 
-  if (allowedOrigins.includes(origin)) {
+  if (allowedOrigins === origin) {
     res.header("Access-Control-Allow-Origin", origin);
   }
 
@@ -35,7 +32,6 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-let statDetails = "";
 let leaderboard;
 let username;
 let score = 0;
