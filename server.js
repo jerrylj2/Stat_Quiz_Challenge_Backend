@@ -70,7 +70,12 @@ app.get('/statdetails', async (req, res) => {
     const { field, count } = req.query;
     console.log("Parsed count:", parseInt(count));
 
-    const client = new pg.Client(urlConnection);
+    const client = new pg.Client({
+      connectionString: urlConnection,
+      ssl: {
+        rejectUnauthorized: false
+      }
+    });
     await client.connect();
 
     const result = await client.query(
