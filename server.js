@@ -65,7 +65,10 @@ app.get("/leaderboard", async (req, res) => {
 // Post the questions details based on the quiz type and question number
 app.get('/statdetails', async (req, res) => {
   try {
+    console.log("Incoming query params:", req.query);
+
     const { field, count } = req.query;
+    console.log("Parsed count:", parseInt(count));
 
     const client = new pg.Client(urlConnection);
     await client.connect();
@@ -77,14 +80,12 @@ app.get('/statdetails', async (req, res) => {
 
     await client.end();
 
-    if (!result.rows || result.rows.length === 0) {
-      return res.status(404).json({ message: "No data returned from GetStat" });
-    }
+    console.log("DB result:", result.rows);
 
     res.json(result.rows[0]);
 
   } catch (error) {
-    console.error('Error with quiz parameters:', error);
+    console.error('Error with statdetails:', error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 });
